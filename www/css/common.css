@@ -1,0 +1,87 @@
+@charset "utf-8";
+
+/* =======================================
+
+	CommonElements
+
+======================================= */
+body {
+	font-size: 100%;
+	line-height: 140%;
+	font-family: Arial,Helvetica,sans-serif;
+	color: #000;
+	text-align: center;
+	background: #fff;
+}
+
+a:link { text-decoration:none; color: #000;}
+a:visited { text-decoration:none; color: #000;}
+a:active { text-decoration:none; color: #000;}
+a:hover { text-decoration:none; color: #000;}
+
+h1 {
+	margin-bottom: 50px;
+	padding: 20px 0;
+	background: #000;
+	color: #fff;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+}
+h2 {
+	padding: 30px 0;
+	width: 100%;
+	font-size: 12px;
+}
+
+#container {
+	margin: 0 auto;
+	width: 320px;
+	text-align: center;
+}
+
+/* #flickscroll
+--------------------------- */
+#flickscroll {
+	margin: 0 auto;
+	width: 320px;
+	height: 320px;
+	text-align: left;
+	position: relative;
+	overflow: hidden;
+	cursor: pointer;
+}
+#flickscroll ul {
+	top: 0;
+	left: 0;
+	height: 320px;
+	position: absolute;
+	overflow: hidden;
+}
+#flickscroll ul li {
+	width: 320px;
+	height: 320px;
+	float: left;
+	display: inline;
+	overflow: hidden;
+}
+
+
+
+
+/* =======================================
+	ClearFixElements
+======================================= */
+#flickscroll ul:after{
+	content: ".";
+	height: 0;
+	clear: both;
+	display: block;
+	visibility: hidden;
+}
+
+#flickscroll ul{
+	display: inline-block;
+	overflow: hidden;
+}
+

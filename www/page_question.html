@@ -1,0 +1,71 @@
+<ons-page ng-controller="mapQCtrl">
+    <ons-toolbar fixed-style="">
+        <div class="left">
+            
+        </div>
+        <div class="center">このアプリの説明</div>
+    </ons-toolbar>
+
+    <div style="width:90%; margin-left: 5%;margin-right: 5%;margin-bottom: 5%;margin-top: 5%;">
+        実際にその場所に行くことでしか知り得ない情報を登録してシェアするアプリです。<br />
+        <br />
+        「登録する」で現在地を表示します。
+        <div class="marker_div">
+        現在地
+        <p><img src="./images/bluedot.png" /></p>
+        </div>
+        現在地をタップすると現在地の情報を登録できます。
+        マップ上の任意の点をタップすると、その地点の情報を登録できます。
+        「トイレ」というキーワードを入れるとトイレアイコンで表示します。<br />
+        
+        <div class="formarea" style="margin-top: 10px;margin-bottom: 20px;">
+            <ons-button id="btn_regi" modifier="large--cta" onclick="myNavigator.pushPage('page_map_regi.html');">
+            登録する
+            </ons-button>
+        </div>
+        
+        「マップで見る」で登録した地点をマップ表示して確認できます。<br />
+        
+        <div class="formarea" style="margin-top: 10px;margin-bottom: 20px;">
+            <ons-button id="btn_view" modifier="large--cta" onclick="myNavigator.pushPage('page_map.html');">
+            マップで見る
+            </ons-button>
+        </div>
+        
+        「リストで見る」で登録した地点の説明をリスト表示で確認できます。リストを長押しすると登録データを削除できます。<br />
+        
+        <div class="formarea" style="margin-top: 10px;margin-bottom: 20px;">
+            <ons-button id="btn_view" modifier="large--cta" onclick="myNavigator.pushPage('page_list.html');">
+            リストで見る
+            </ons-button>
+        </div>
+        
+        ある程度データがたまったら、下のボタンを押してください。位置情報の全データをサーバへ送信してシェアします。
+        
+        <div class="formarea" style="margin-top: 10px;margin-bottom: 20px;">
+            <ons-button id="btn_call" modifier="large--cta" onclick="send_json();">
+            データを送る
+            </ons-button>
+        </div>
+        
+        下のボタンを押すとシェアされている位置を表示します。現在地から数キロ圏内の静岡の公園も表示されます。
+        <div class="marker_div">
+        （なにか情報のある地点）
+        <p><img src="./images/information.png" /></p>
+        </div>
+        <div class="marker_div">
+        「トイレ」というキーワードを含む地点
+        <p><img src="./images/toilets.png" /></p>
+        </div>
+        <div class="marker_div">
+        現在地から約3キロ圏内の静岡の公園
+        <p><img src="./images/forest.png" /></p>
+        </div>
+        <div class="formarea" style="margin-top: 10px;margin-bottom: 20px;">
+            <ons-button id="btn_view" modifier="large--cta" onclick="myNavigator.pushPage('page_point_view.html');">
+            シェアされたデータを見る
+            </ons-button>
+        </div>
+    </div>
+    
+</ons-page>

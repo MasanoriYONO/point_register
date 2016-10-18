@@ -1,0 +1,369 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<script src="components/loader.js"></script>
+<link rel="stylesheet" href="components/loader.css">
+<link rel="stylesheet" href="css/style.css">
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js" type="text/javascript"></script>
+
+<script src="js/custom.js"></script>
+<script src="js/points_list.js"></script>
+<script type="text/javascript">
+    var myApp = ons.bootstrap();
+    
+    document.addEventListener("deviceready", onDeviceReady, false);
+        
+    function onDeviceReady(){
+        console.log("PhoneGap is ready.");
+        
+        map_createDB();
+        
+    }
+    
+    myApp.controller('mapQCtrl', function () {
+        console.log("mapQCtrl is ready.");
+        
+        $("#btn_view").attr('disabled', true);
+        map_get_saved_date_FromDB();
+    });
+    
+    myApp.controller('listCtrl', function () {
+        console.log("listCtrl is ready.");
+        
+    });
+    
+    
+    myApp.controller('mapDetailCtrl', function () {
+        console.log("mapDetailCtrl is ready.");
+        
+        var markerObjs = new Array();
+        var map = null;
+        var mapCurrent = null;
+        var mapDest = null;
+        
+        $("#map_canvas").empty();
+    
+        //マップ関係
+        var mapDiv = $("#map_canvas").get(0);
+        // 位置情報取得オブジェクトチェック
+        
+        var data = new Array();
+        
+        
+        data.push({lat:array_points[detail_id].lat
+            , lng:array_points[detail_id].lng
+            , name:array_points[detail_id].division
+            , recdate:array_points[detail_id].recdate});
+        
+        
+        // GoogleMapにデータを渡す
+        mapCenter = new google.maps.LatLng(data[0].lat, data[0].lng);
+        
+        var options = {
+            zoom:16,                // 表示倍率
+            center:mapCenter,       // 中央位置
+            mapTypeId:google.maps.MapTypeId.ROADMAP,
+            scaleControl:true       // 倍率変更
+        };
+        // 地図を表示
+        map = new google.maps.Map(mapDiv, options);
+        map.setCenter(mapCenter);
+        var latLngBounds = new google.maps.LatLngBounds();
+        // latLngBounds.extend(mapCenter);
+        
+        markerObjs = new Array();
+        //マーカの作成
+        jQuery.each(data, function()
+        {
+            var latlng = new google.maps.LatLng(this.lat, this.lng);
+            var t_name = this.name;
+            
+            latLngBounds.extend(latlng);
+            if ( t_name.indexOf('トイレ') != -1) {
+                var t_park = new google.maps.Marker({
+                    position: latlng,
+                    map: map,
+                    title: this.name + "<br />" + this.recdate,
+                    icon: new google.maps.MarkerImage(
+                            './images/toilets.png',
+                            new google.maps.Size(32,37), // size
+            		        new google.maps.Point(0,0),  // origin
+                    		new google.maps.Point(16,37) // anchor	
+                    	)
+                    });
+            }else{
+                var t_park = new google.maps.Marker({
+                    position: latlng,
+                    map: map,
+                    title: this.name + "<br />" + this.recdate,
+                    icon: new google.maps.MarkerImage(
+                            './images/information.png',
+                            new google.maps.Size(32,37), // size
+            		        new google.maps.Point(0,0),  // origin
+                    		new google.maps.Point(16,37) // anchor	
+                    	)
+                    });
+            }
+            
+            //追加したオブジェクトにイベントリスナを追加。
+            google.maps.event.addListener(t_park, 'click', function() {
+                var infoWindow = new google.maps.InfoWindow();
+                infoWindow.setContent(t_park.title);
+                infoWindow.open(map, t_park);
+       
+ 			});
+            
+            //配列に追加する。
+            markerObjs.push(t_park);
+        });
+    		
+            
+		addMarker();
+        // 全てのマーカーが表示される様に表示領域を設定する
+        // map.fitBounds(latLngBounds);
+
+        // 地図にマーカーを追加
+        function addMarker(){
+            jQuery.each(markerObjs, function()
+            {
+                this.setMap(map);
+            });
+        }
+    });
+    
+    myApp.controller('mapCtrl', function () {
+        console.log("mapCtrl is ready.");
+        
+        var markerObjs = new Array();
+        var map = null;
+        var mapCurrent = null;
+        var mapDest = null;
+        
+        $("#map_canvas").empty();
+    
+        //マップ関係
+        var mapDiv = $("#map_canvas").get(0);
+        // 位置情報取得オブジェクトチェック
+        
+        var data = new Array();
+        
+        for(var i=0; i< array_points.length; i++){
+            data.push({lat:array_points[i].lat, lng:array_points[i].lng, name:array_points[i].division, recdate:array_points[i].recdate});
+        }
+        
+        // GoogleMapにデータを渡す
+        mapCenter = new google.maps.LatLng(data[0].lat, data[0].lng);
+        
+        var options = {
+            zoom:16,                // 表示倍率
+            center:mapCenter,       // 中央位置
+            mapTypeId:google.maps.MapTypeId.ROADMAP,
+            scaleControl:true       // 倍率変更
+        };
+        // 地図を表示
+        map = new google.maps.Map(mapDiv, options);
+        map.setCenter(mapCenter);
+        var latLngBounds = new google.maps.LatLngBounds();
+        latLngBounds.extend(mapCenter);
+        
+        markerObjs = new Array();
+        //マーカの作成
+        jQuery.each(data, function()
+        {
+            var latlng = new google.maps.LatLng(this.lat, this.lng);
+            var t_name = this.name;
+            
+            latLngBounds.extend(latlng);
+            if ( t_name.indexOf('トイレ') != -1) {
+                var t_park = new google.maps.Marker({
+                    position: latlng,
+                    map: map,
+        	        title: this.name + "<br />" + this.recdate,
+                    icon: new google.maps.MarkerImage(
+                            './images/toilets.png',
+                            new google.maps.Size(32,37), // size
+            		        new google.maps.Point(0,0),  // origin
+                    		new google.maps.Point(16,37) // anchor	
+                    	)
+                    });
+            }else{
+                var t_park = new google.maps.Marker({
+                    position: latlng,
+                    map: map,
+                    title: this.name + "<br />" + this.recdate,
+                    icon: new google.maps.MarkerImage(
+                            './images/information.png',
+                            new google.maps.Size(32,37), // size
+            		        new google.maps.Point(0,0),  // origin
+                    		new google.maps.Point(16,37) // anchor	
+                    	)
+                    });
+            }
+            
+            //追加したオブジェクトにイベントリスナを追加。
+            google.maps.event.addListener(t_park, 'click', function() {
+                var infoWindow = new google.maps.InfoWindow();
+                infoWindow.setContent(t_park.title);
+                infoWindow.open(map, t_park);
+       
+ 			});
+            
+            //配列に追加する。
+            markerObjs.push(t_park);
+        });
+    		
+            
+		addMarker();
+        // 全てのマーカーが表示される様に表示領域を設定する
+        map.fitBounds(latLngBounds);
+
+        // 地図にマーカーを追加
+        function addMarker(){
+            jQuery.each(markerObjs, function()
+            {
+                this.setMap(map);
+            });
+        }
+    });
+    
+    myApp.controller('mapRegiCtrl', function () {
+        console.log("mapRegiCtrl is ready.");
+        
+        // google.maps.event.addDomListener(window, 'load', function(){
+        //マップ関係
+        var map;
+        var mapCenter;
+        var mapDiv = document.getElementById("map_canvas");
+        var currentPos;
+        var targetPos;
+        var destMarker;
+        
+        // 位置情報取得オブジェクトチェック
+        if (!navigator.geolocation){
+            mapDiv.innerHTML = "Geolocation 使用不可";
+            return;
+        }
+     
+        // 位置情報取得オブジェクトオプション
+        var option = {
+            timeout:10000,            // タイムアウト
+            enableHighAccuracy:true   // GPS利用
+        }
+     
+        // 位置情報を取得
+        navigator.geolocation.getCurrentPosition(resultHandler, errorHandler, option);
+
+        // 位置情報取得成功時
+        function resultHandler(position){
+            latitude = position.coords.latitude;
+            longitude = position.coords.longitude;
+            
+            // GoogleMapにデータを渡す
+            mapCenter = new google.maps.LatLng(latitude, longitude);
+            var options = {
+                zoom:17,                // 表示倍率
+                center:mapCenter,       // 中央位置
+                mapTypeId:google.maps.MapTypeId.ROADMAP,
+                scaleControl:true       // 倍率変更
+            };
+            // 地図を表示
+            map = new google.maps.Map(mapDiv, options);
+            
+            var blue_dot_image = new google.maps.MarkerImage(
+        		'images/bluedot.png',
+					null, // size
+					null, // origin
+					new google.maps.Point( 8, 8 ), // anchor (move to center of marker)
+					new google.maps.Size( 17, 17 ) // scaled size (required for Retina display icon)
+			);
+                
+            // 現在地を表示
+            var marker = new google.maps.Marker({
+                position:mapCenter,
+                map:map,
+                title:"現在地",
+                icon: blue_dot_image,
+                flat: true,
+                optimized: false,
+    	        visible: true
+            });
+            
+            map.setCenter(mapCenter);
+            
+            google.maps.event.addListener(marker, 'click', function() {
+                map_lat = latitude;
+                map_lng = longitude;
+                
+                navigator.notification.prompt(
+                    "現在地の説明を入力してください。", 
+                    map_modifyCallback, 
+                    "ここはなに？", 
+                    ["OK","キャンセル"],
+                    "現在地の説明");
+                	
+  			});
+            
+            google.maps.event.addListener(map, 'click', setMarker);
+        
+        }
+     
+        // 位置情報取得失敗時
+        function errorHandler(error){
+            mapDiv.innerHTML = error.message;
+        }
+        
+        
+        //クリックした場所にマーカーを設置
+        /*-------------------------------------------------------------------*/
+        function setMarker(event){
+
+            //クリック位置の緯度経度取得
+            targetPos = new google.maps.LatLng(event.latLng.lat(), event.latLng.lng());
+            map_lat = event.latLng.lat();
+            map_lng = event.latLng.lng();
+            console.log("target lat:" + map_lat);
+            console.log("target lng:" + map_lng);
+            
+            //すでにマーカーがある場合は地図から削除する
+            if( destMarker ){
+                destMarker.setMap(null);
+            }
+
+            //マーカーの作成
+            destMarker = new google.maps.Marker({
+                map : map ,
+                position : targetPos,
+                icon: new google.maps.MarkerImage(
+                        './images/information.png',
+    	                new google.maps.Size(32,37), // size
+        		        new google.maps.Point(0,0),  // origin
+                		new google.maps.Point(16,37) // anchor	
+                	)
+            });
+            destMarker.setMap(map);
+            
+            //現在位置とマーカーの徒歩でのルート検索
+            // requestRoute( mapCenter , targetPos );
+            navigator.notification.prompt(
+                "この場所の説明を入力してください。", 
+                map_modifyCallback, 
+                "ここはなに？", 
+                ["OK","キャンセル"],
+                "この場所の説明");
+        }
+        
+        // });
+    });
+    
+</script>
+</head>
+<body>
+    <ons-navigator var="myNavigator" page="page_question.html">
+    </ons-navigator>
+</body>
+</html>
